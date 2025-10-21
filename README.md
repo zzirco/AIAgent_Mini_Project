@@ -60,10 +60,7 @@
 
 ## Architecture
 
-(그래프 이미지)
-
-> 구성: **Supervisor → (Market/Company/Stock) → Chart → Report**
-> RAG(Vector DB)와 Object Storage에 증거·차트·PDF를 아카이빙.
+<img width="2508" height="3862" alt="Image" src="https://github.com/user-attachments/assets/00de44ea-d73f-4887-af42-e35600b7d397" />
 
 ## Directory Structure
 
