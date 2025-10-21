@@ -16,15 +16,14 @@
 
 ## Tech Stack
 
-| Category  | Details                                              |
-| --------- | ---------------------------------------------------- |
-| Framework | LangGraph, LangChain, Python                         |
-| LLM       | GPT-4o-mini via OpenAI API (configurable)            |
-| Retrieval | FAISS or Chroma (Agentic RAG)                        |
-| Embedding | multilingual-e5-large or OpenAI Embeddings           |
-| Data      | yfinance/재무API, 뉴스/IR/PDF 로더                   |
-| Report    | WeasyPrint(or LaTeX), matplotlib/plotly              |
-| Storage   | Object Storage(S3 호환), Vector DB, PostgreSQL(meta) |
+| Category  | Details                                   |
+| --------- | ----------------------------------------- |
+| Framework | LangGraph, LangChain, Python              |
+| LLM       | GPT-4o-mini via OpenAI API (configurable) |
+| Retrieval | Chroma (Agentic RAG)                      |
+| Embedding | OpenAI Embeddings                         |
+| Data      | yfinance/재무API, 뉴스/IR/PDF 로더        |
+| Report    | WeasyPrint(or LaTeX), matplotlib/plotly   |
 
 ## Agents
 
@@ -37,26 +36,44 @@
 
 ## State
 
-- **period** : 분석 기간(e.g., `last_90d`, `2025-01-01~2025-09-30`)
-- **regions** : 분석 지역 리스트(e.g., `["global","US","EU","CN","KR"]`)
-- **focus_issues** : 이슈 키워드(e.g., 수요둔화/보조금/배터리케미스트리/충전)
-- **segments** : 세그먼트(e.g., 승용/SUV/픽업/상용)
-- **depth** : 분석 깊이(`quick|standard|deep`)
-- **snapshot_date** : 데이터 기준일(재현성)
-- **output** : 형식·언어·섹션 포함 설정(PDF/HTML/MD, KO/EN)
-- **constraints** : 페이지/차트/참고문헌 최소 수 등 제한
-- **benchmarks** : 비교 바스켓(티커/심볼, 선택)
-- **policies** : 정책 관심사(IRA, EU 규제 등)
-- **financials** : 통화/멀티플/이벤트 윈도우
-- **data_prefs** : 소스/언어 우선순위
-- **risk_lens** : 리스크 가중치(수요/정책/공급망/기술)
-- **cadence** : 배치 주기(주간/월간/애드혹)
-- **persona** : 리포트 톤(전략/투자 등)
-- **market_brief** : 시장 브리핑 아티팩트(트렌드/지표/증거)
-- **company_dossiers** : 기업별 도시에(하이라이트/리스크/증거)
-- **stock_snapshots** : 주가·멀티플·이벤트 스냅샷
-- **charts** : 생성된 차트 자산 목록
-- **report_path** : 최종 리포트 파일 경로
+| State Key     | Producer(출력)           | Consumer(입력)                    | 비고                 |
+| ------------- | ------------------------ | --------------------------------- | -------------------- |
+| run_id        | Supervisor.parse_request | 모든 노드 로그 태깅               | 실행 추적            |
+| period        | Supervisor.parse_request | Market/Company/Stock/Chart/Report | 전 에이전트 공통     |
+| regions       | Supervisor.parse_request | Market/Company/Report             | 수집 범위            |
+| focus_issues  | Supervisor.parse_request | Market/Report                     | RAG 쿼리 키워드      |
+| segments      | Supervisor.parse_request | Market/Report                     | 세그먼트 통계        |
+| depth         | Supervisor.parse_request | Chart/Report/Supervisor.qa_gate   | 리소스 제한          |
+| snapshot_date | Supervisor.parse_request | Market/Company/Report             | 재현성 기준일        |
+| output        | Supervisor.parse_request | Report/Chart/Supervisor.handoff   | 포맷/언어/섹션       |
+| constraints   | Supervisor.parse_request | Chart/Report/Supervisor.qa_gate   | 페이지/차트/레퍼런스 |
+| benchmarks    | Supervisor.parse_request | Company/Stock/Report              | 선택: 비교 바스켓    |
+| policies      | Supervisor.parse_request | Market/Report                     | 정책 이슈            |
+| financials    | Supervisor.parse_request | Stock/Report                      | 통화/멀티플          |
+| data_prefs    | Supervisor.parse_request | Market/Company                    | 소스/언어 우선       |
+| risk_lens     | Supervisor.parse_request | Report                            | 리스크 챕터 강조     |
+| cadence       | Supervisor.parse_request | (배치) Scheduler                  | 런타임 외부          |
+| persona       | Supervisor.parse_request | Report                            | 톤/요약 스타일       |
+
+| 산출물 Key       | Producer                                                      | Consumer                          | 비고           |
+| ---------------- | ------------------------------------------------------------- | --------------------------------- | -------------- |
+| raw_docs         | Market.collect / Company.collect                              | Market.index / Company.index      | 원문 메타      |
+| indexed_ids      | Market.index / Company.index                                  | Market.extract / Company.compose  | VDB keys       |
+| market_brief     | Market.extract                                                | Chart/Report/Supervisor.merge     | 산업 핵심 요약 |
+| company_dossiers | Company.compose                                               | Report/Supervisor.merge           | 기업 도시에    |
+| stock_snapshots  | Stock.compute                                                 | Chart/Report/Supervisor.merge     | 주가/멀티플    |
+| charts           | Chart.render                                                  | Report                            | 시각 자산      |
+| evidence_map     | Market.validate / Company.validate / Chart.register           | Report/Supervisor.qa_gate         | [n] 매핑       |
+| draft_report_md  | Supervisor.merge / Report.compose                             | Report.export, Supervisor.qa_gate | 중간 원문      |
+| report_path      | Report.export                                                 | (최종 출력)                       | PDF 경로       |
+| qa_metrics       | Supervisor.qa_gate / Stock.validate / Market/Company.validate | (감시/로그)                       | 커버리지/정합  |
+
+| 품질/오류                     | Producer              | Consumer           | 비고          |
+| ----------------------------- | --------------------- | ------------------ | ------------- |
+| errors[]                      | 모든 노드(예외 시)    | Supervisor         | 리트라이/폴백 |
+| qa_metrics.citation_coverage  | Market/Company        | Supervisor.qa_gate | ≥ 0.9 권장    |
+| qa_metrics.number_consistency | Stock                 | Supervisor.qa_gate | 수치 정합성   |
+| qa_metrics.document_ok        | Report.post_export_qc | 최종 상태          | 배포 전 체크  |
 
 ## Architecture
 
