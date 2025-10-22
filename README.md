@@ -1,6 +1,6 @@
 # EV Market Trend Analysis Agent
 
-본 프로젝트는 **전기차(EV) 시장 트렌드 분석** 에이전트를 설계하고 구현한 실습 프로젝트입니다.
+본 프로젝트는 **전기차(EV) 시장 트렌드 분석 리포트 생성** 에이전트 구축 프로젝트입니다.
 
 ## Overview
 
@@ -19,19 +19,21 @@
 | Category  | Details                                   |
 | --------- | ----------------------------------------- |
 | Framework | LangGraph, LangChain, Python              |
-| LLM       | GPT-4o-mini via OpenAI API (configurable) |
-| Retrieval | Chroma (Agentic RAG)                      |
-| Embedding | OpenAI Embeddings                         |
-| Data      | yfinance/재무API, 뉴스/IR/PDF 로더        |
-| Report    | WeasyPrint(or LaTeX), matplotlib/plotly   |
+| LLM       | GPT-4o-mini                               |
+| Retrieval | Hybrid Retrieval (Semantic + BM25)        |
+| Embedding | OllamaEmbeddings (nomic-embed-text)       |
+| Vector Store | ChromaDB                               |
+| Data      | yfinance/재무API, 뉴스/IR/PDF 로더         |
+| Chart     | WeasyPrint                                |
+| Report    | ReportLab                                 |
 
 ## Agents
 
-- **Supervisor** : 사용자 입력 파싱, 실행계획/병렬화, 실패 재시도·가드레일
-- **Market_Researcher** : EV/배터리/정책/인프라 **시장 트렌드** 수집·요약(증거 링크 포함)
+- **Supervisor** : 사용자 입력 파싱, 실행계획/병렬화, 리포트 품질 평가
+- **Market_Researcher** : EV/배터리/정책/인프라 **시장 트렌드** 수집·요약(출처 포함)
 - **Company_Analyzer** : 기업 **사업전개/리스크/로드맵** 정리(공시/IR/PDF 파싱)
-- **Stock_Analyzer** : 티커별 **수익률/변동성/멀티플/이벤트** 스냅샷
-- **Chart_Generator** : 점유율·가격·주가 비교 등 **시각화 자산** 생성
+- **Stock_Analyzer** : 티커별 **수익률/변동성/종목이슈** 스냅샷
+- **Chart_Generator** : 점유율·가격·주가 비교 등 **시각화 자료** 생성
 - **Report_Compiler** : SUMMARY·본문·REFERENCE·(옵션)APPENDIX를 합쳐 **PDF** 생성
 
 ## State
@@ -69,7 +71,7 @@
 | **charts**           | **Chart_Generator · `render_charts`**                                                                                                                   | Report_Compiler(compose/export)                                                             | 이미지 경로/alt 포함        |
 | **evidence_map**     | **Market_Researcher · `validate_citations_market`**, **Company_Analyzer · `validate_citations_company`**, **Chart_Generator · `register_chart_assets`** | Supervisor · `qa_gate`, Report_Compiler(compose/REFERENCE)                                  | [n] ↔ 링크 매핑             |
 | **draft_report_md**  | **Supervisor · `merge_artifacts`**(초안 뼈대) → **Report_Compiler · `compose_sections`**(본문 완성)                                                     | Report_Compiler(export), Supervisor · `qa_gate`                                             | 초안→완성 단계              |
-| **report_path**      | **Report_Compiler · `export_pdf`**                                                                                                                      | 최종 배포(오브젝트 스토리지/슬랙 업로드 등)                                                 | 최종 산출물 경로            |
+| **report_path**      | **Report_Compiler · `export_pdf`**                                                                                                                      | 리포트 최종 생성                                       | 최종 산출물 경로            |
 
 ### C) 품질/메타/오류 State
 
