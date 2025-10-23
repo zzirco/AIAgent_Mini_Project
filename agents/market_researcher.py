@@ -40,8 +40,18 @@ def extract_market_signals(state: AgentState) -> Dict[str, Any]:
     try:
         from services.llm import summarize_market_trends_with_global_refs
 
-        raw_docs = state.get("raw_docs", [])
-        start_ref = state.get("_global_ref_counter", 1)
+        # raw_docs에서 market 관련 문서만 필터링
+        all_docs = state.get("raw_docs", [])
+        raw_docs = [d for d in all_docs if d.get("source") == "tavily" and d.get("region") in ["global", "US", "EU", None]]
+
+        # Market 에이전트는 항상 1부터 시작
+        start_ref = 1
+
+        # 디버깅: raw_docs 타입 확인
+        print(f"[Market_Researcher] raw_docs type: {type(raw_docs)}")
+        if raw_docs and len(raw_docs) > 0:
+            print(f"[Market_Researcher] First doc type: {type(raw_docs[0])}")
+            print(f"[Market_Researcher] First doc keys: {raw_docs[0].keys() if isinstance(raw_docs[0], dict) else 'NOT A DICT'}")
 
         print(f"[Market_Researcher] Calling LLM with {len(raw_docs)} documents (refs start at {start_ref})")
 
@@ -80,17 +90,16 @@ def extract_market_signals(state: AgentState) -> Dict[str, Any]:
             "evidence": evidence
         }
 
-        # 다음 에이전트를 위해 카운터 증가
-        next_ref = start_ref + len(raw_docs)
-
         print(f"[Market_Researcher] LLM generated {len(market_brief['top_trends'])} trends with {len(evidence)} evidence")
         return {
-            "market_brief": market_brief,
-            "_global_ref_counter": next_ref
+            "market_brief": market_brief
         }
 
     except Exception as e:
+        import traceback
         print(f"[Market_Researcher] ERROR in extract_market_signals: {e}")
+        print(f"[Market_Researcher] ERROR traceback:")
+        traceback.print_exc()
         # 폴백: 기본 더미 데이터
         market_brief = {
             "period": state["period"],

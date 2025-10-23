@@ -112,10 +112,13 @@ def summarize_market_trends_with_global_refs(
         for i, doc in enumerate(documents[:10])  # 최대 10개 문서
     ])
 
-    # 프롬프트 구성
+    # 프롬프트 구성 (.format() 대신 직접 문자열 조합으로 중괄호 에러 방지)
     prompt_template = load_prompt_template("market_prompt.md")
     if not prompt_template:
-        prompt_template = """다음 EV 시장 관련 문서들을 분석하여:
+        focus_issues_str = ", ".join(focus_issues)
+        regions_str = ", ".join(regions)
+
+        prompt = f"""다음 EV 시장 관련 문서들을 분석하여:
 1. 주요 트렌드 3-5개 (각 한 줄로 요약)
 2. 전체 요약 (2-3문장)
 
@@ -130,8 +133,8 @@ def summarize_market_trends_with_global_refs(
 {context}
 
 분석 기간: {period}
-관심 이슈: {focus_issues}
-지역: {regions}
+관심 이슈: {focus_issues_str}
+지역: {regions_str}
 
 JSON 형식으로 응답:
 {{
@@ -141,13 +144,15 @@ JSON 형식으로 응답:
 }}
 
 referenced_docs에는 실제로 인용한 문서 번호만 포함하세요."""
-
-    prompt = prompt_template.format(
-        context=context,
-        period=period,
-        focus_issues=", ".join(focus_issues),
-        regions=", ".join(regions)
-    )
+    else:
+        # 템플릿 파일이 있는 경우도 f-string으로 처리
+        focus_issues_str = ", ".join(focus_issues)
+        regions_str = ", ".join(regions)
+        # 템플릿에 변수가 있다면 수동으로 치환
+        prompt = prompt_template.replace("{context}", context)
+        prompt = prompt.replace("{period}", period)
+        prompt = prompt.replace("{focus_issues}", focus_issues_str)
+        prompt = prompt.replace("{regions}", regions_str)
 
     try:
         from langchain_core.messages import HumanMessage
@@ -155,6 +160,9 @@ referenced_docs에는 실제로 인용한 문서 번호만 포함하세요."""
         import re
 
         response = llm.invoke([HumanMessage(content=prompt)])
+        print(f"[LLM] Raw response type: {type(response.content)}")
+        print(f"[LLM] Raw response (first 500 chars): {response.content[:500]}")
+
         result = json.loads(response.content)
 
         # 중복 인용 제거
@@ -355,7 +363,10 @@ HTML 형식으로 작성 (제목 제외, 본문만). 인용 번호 [n]을 포함
         from langchain_core.messages import HumanMessage
         import json
 
-        prompt_filled = prompt.format(context=json.dumps(context, ensure_ascii=False, indent=2))
+        # .format() 대신 .replace()로 중괄호 에러 방지
+        context_json = json.dumps(context, ensure_ascii=False, indent=2)
+        prompt_filled = prompt.replace("{context}", context_json)
+
         response = llm.invoke([HumanMessage(content=prompt_filled)])
         # 중복 인용 제거
         return clean_citations(response.content)

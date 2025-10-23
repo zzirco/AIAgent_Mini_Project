@@ -267,7 +267,11 @@ def normalize_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     out = []
     for r in records:
-        r = dict(r)
+        # SourceDoc 객체일 경우 딕셔너리로 변환
+        if hasattr(r, '__dataclass_fields__'):
+            r = asdict(r)
+        else:
+            r = dict(r)
         # 날짜 보정
         date = r.get("date") or _today_iso()
         try:

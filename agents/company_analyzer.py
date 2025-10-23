@@ -55,7 +55,9 @@ def compose_company_dossiers(state: AgentState) -> Dict[str, Any]:
 
     idx = state.get("_company_index")
     dossiers = []
-    start_n = state.get("_global_ref_counter", 10)  # 전역 카운터 사용
+
+    # Company 에이전트는 100부터 시작 (market과 겹치지 않도록)
+    start_n = 100
 
     for tk in state.get("benchmarks", []):
         # 회사별 쿼리(간단 키워드 기반)
@@ -144,10 +146,8 @@ def compose_company_dossiers(state: AgentState) -> Dict[str, Any]:
         # 다음 회사를 위해 start_n 업데이트
         start_n += len(ev)
 
-    # 전역 카운터 업데이트
     return {
-        "company_dossiers": dossiers,
-        "_global_ref_counter": start_n
+        "company_dossiers": dossiers
     }
 
 

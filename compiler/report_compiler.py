@@ -54,28 +54,93 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
         "period": state.get("period", ""),
     }
 
+    # 표지 페이지
+    cover_page = f"""
+    <div class="cover-page">
+        <div class="cover-title">
+            <h1>EV Market Trend Analysis Report</h1>
+            <h2>전기차 시장 동향 분석 보고서</h2>
+        </div>
+        <div class="cover-metadata">
+            <p><strong>분석 기간:</strong> {state.get('period', 'N/A')}</p>
+            <p><strong>보고서 생성일:</strong> {state.get('snapshot_date', 'N/A')}</p>
+            <p><strong>분석 대상 지역:</strong> {', '.join(state.get('regions', ['Global']))}</p>
+            <p><strong>분석 세그먼트:</strong> {', '.join(state.get('segments', ['All Segments']))}</p>
+        </div>
+    </div>
+    <div class="page-break"></div>
+    """
+
+    # 목차 생성
+    toc = """
+    <div class="toc-page">
+        <h1>목차 (Table of Contents)</h1>
+        <ul class="toc-list">
+            <li><a href="#section-summary">1. SUMMARY</a></li>
+            <li><a href="#section-market-overview">2. 시장 개요 & 핵심 트렌드</a></li>
+            <li><a href="#section-demand-pricing">3. 수요 & 가격 전략(마진 압력)</a></li>
+            <li><a href="#section-policy">4. 정책·규제 Watch</a></li>
+            <li><a href="#section-battery">5. 배터리 기술 & 공급망 코어</a></li>
+            <li><a href="#section-competition">6. 경쟁 구도 & 지역 하이라이트</a></li>
+            <li><a href="#section-implications">7. 전략/투자 시사점</a></li>
+            <li><a href="#section-stock">8. 주가/재무 스냅샷</a></li>
+            <li><a href="#section-reference">9. REFERENCE</a></li>
+            <li><a href="#section-appendix">10. APPENDIX</a></li>
+        </ul>
+    </div>
+    <div class="page-break"></div>
+    """
+
+    # 차트 데이터 가져오기
+    charts = state.get("charts", [])
+    chart_by_section = {}
+    for chart in charts:
+        section = chart.get("section", "unknown")
+        if section not in chart_by_section:
+            chart_by_section[section] = []
+        chart_by_section[section].append(chart)
+
     # 섹션 조립
     body_parts = []
-    body_parts.append(f"<h1>SUMMARY</h1><p>{mb.get('summary','LLM 요약 생성 중...')}</p>")
+    body_parts.append(f'<h1 id="section-summary">1. SUMMARY</h1><p>{mb.get("summary","LLM 요약 생성 중...")}</p>')
 
     trends = mb.get("top_trends", []) or ["트렌드 정보 없음"]
-    body_parts.append("<h2>시장 개요 & 핵심 트렌드</h2><ul>" + "".join([f"<li>{t}</li>" for t in trends]) + "</ul>")
+    body_parts.append('<h2 id="section-market-overview">2. 시장 개요 & 핵심 트렌드</h2><ul>' + "".join([f"<li>{t}</li>" for t in trends]) + "</ul>")
+
+    # 시장 트렌드 차트 추가
+    if "market" in chart_by_section:
+        for chart in chart_by_section["market"]:
+            chart_path = Path(chart["path"])
+            if chart_path.exists():
+                chart_uri = chart_path.resolve().as_uri()
+                body_parts.append(f'<div class="chart-container"><img src="{chart_uri}" alt="{chart["alt"]}" class="chart-image"/></div>')
+            else:
+                body_parts.append(f'<p class="chart-error">차트를 찾을 수 없습니다: {chart["path"]}</p>')
 
     # LLM으로 각 섹션 콘텐츠 생성
-    body_parts.append("<h2>수요 & 가격 전략(마진 압력)</h2>")
+    body_parts.append('<h2 id="section-demand-pricing">3. 수요 & 가격 전략(마진 압력)</h2>')
     demand_content = generate_section_content("demand_pricing", context)
     body_parts.append(demand_content)
 
-    body_parts.append("<h2>정책·규제 Watch</h2>")
+    body_parts.append('<h2 id="section-policy">4. 정책·규제 Watch</h2>')
     policy_content = generate_section_content("policy", context)
     body_parts.append(policy_content)
 
-    body_parts.append("<h2>배터리 기술 & 공급망 코어</h2>")
+    body_parts.append('<h2 id="section-battery">5. 배터리 기술 & 공급망 코어</h2>')
     battery_content = generate_section_content("battery_supply", context)
     body_parts.append(battery_content)
 
     # 경쟁 구도 섹션 - 기업 정보가 있으면 표시
-    body_parts.append("<h2>경쟁 구도 & 지역 하이라이트</h2>")
+    body_parts.append('<h2 id="section-competition">6. 경쟁 구도 & 지역 하이라이트</h2>')
+
+    # 기업 하이라이트 차트 추가
+    if "company" in chart_by_section:
+        for chart in chart_by_section["company"]:
+            chart_path = Path(chart["path"])
+            if chart_path.exists():
+                chart_uri = chart_path.resolve().as_uri()
+                body_parts.append(f'<div class="chart-container"><img src="{chart_uri}" alt="{chart["alt"]}" class="chart-image"/></div>')
+
     if cds:
         body_parts.append("<h3>주요 기업 하이라이트</h3><ul>")
         for c in cds:
@@ -90,7 +155,7 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
         body_parts.append("<p>기업 데이터가 수집되지 않았습니다.</p>")
 
     # 전략/투자 시사점 섹션
-    body_parts.append("<h2>전략/투자 시사점</h2>")
+    body_parts.append('<h2 id="section-implications">7. 전략/투자 시사점</h2>')
     persona = state.get("persona", "corporate_strategy")
 
     # 실제 데이터 기반 시사점 생성
@@ -127,18 +192,28 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
     else:
         body_parts.append("<p>시사점 생성을 위한 데이터가 부족합니다.</p>")
 
+    # 주가/재무 스냅샷 섹션
+    body_parts.append('<h2 id="section-stock">8. 주가/재무 스냅샷</h2>')
+
+    # 주가 수익률 차트 추가
+    if "stock" in chart_by_section:
+        for chart in chart_by_section["stock"]:
+            chart_path = Path(chart["path"])
+            if chart_path.exists():
+                chart_uri = chart_path.resolve().as_uri()
+                body_parts.append(f'<div class="chart-container"><img src="{chart_uri}" alt="{chart["alt"]}" class="chart-image"/></div>')
+
     if ss:
-        body_parts.append("<h2>주가/재무 스냅샷</h2>"
-                          "<ul>" + "".join([f"<li>{s['ticker']}: return {s['period_return_pct']}%, vol {s['volatility']}</li>" for s in ss]) + "</ul>")
+        body_parts.append("<ul>" + "".join([f"<li>{s['ticker']}: return {s['period_return_pct']}%, vol {s['volatility']}</li>" for s in ss]) + "</ul>")
     else:
-        body_parts.append("<h2>주가/재무 스냅샷</h2><p>데이터 준비중</p>")
+        body_parts.append("<p>데이터 준비중</p>")
 
     refs = state.get('evidence_map', []) or []
-    body_parts.append("<h2>REFERENCE</h2><ol>" +
+    body_parts.append('<h2 id="section-reference">9. REFERENCE</h2><ol>' +
                       "".join([f"<li>{e.get('title')} ({e.get('date')}) - {e.get('url')}</li>" for e in refs]) +
                       "</ol>")
 
-    body_parts.append(f"<h2>APPENDIX</h2>"
+    body_parts.append(f'<h2 id="section-appendix">10. APPENDIX</h2>'
                       f"<p>Data snapshot: {state.get('snapshot_date')}</p>"
                       "<p>지표 정의·산식 / 데이터 검증 절차(날짜·수치 일관성 기준) — 데이터 준비중</p>")
 
@@ -158,17 +233,180 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
   html, body {{
     font-family: {"'NotoSansKR'," if font_regular_uri else ""} 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
     font-weight: 400; font-size: 12px; line-height: 1.55;
-    color: #111; margin: 0; padding: 24px;
+    color: #111; margin: 0; padding: 0;
   }}
-  h1 {{ font-weight:700; font-size: 22px; margin: 0 0 12px; }}
-  h2 {{ font-weight:700; font-size: 16px; margin: 18px 0 8px; }}
-  ul {{ margin: 0 0 8px 18px; }}
-  ol {{ margin: 0 0 8px 18px; }}
-  p  {{ margin: 0 0 8px; }}
-  a  {{ color: #0a58ca; text-decoration: none; }}
+
+  /* 표지 스타일 */
+  .cover-page {{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }}
+
+  .cover-title h1 {{
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    letter-spacing: -0.5px;
+  }}
+
+  .cover-title h2 {{
+    font-size: 28px;
+    font-weight: 400;
+    margin: 0 0 60px;
+    opacity: 0.95;
+  }}
+
+  .cover-metadata {{
+    background: rgba(255, 255, 255, 0.15);
+    padding: 30px 50px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }}
+
+  .cover-metadata p {{
+    font-size: 16px;
+    margin: 12px 0;
+    text-align: left;
+  }}
+
+  /* 목차 스타일 */
+  .toc-page {{
+    min-height: 100vh;
+    padding: 60px 40px;
+  }}
+
+  .toc-page h1 {{
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 40px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid #667eea;
+  }}
+
+  .toc-list {{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }}
+
+  .toc-list li {{
+    margin: 18px 0;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }}
+
+  .toc-list li:hover {{
+    background: #e9ecef;
+  }}
+
+  .toc-list a {{
+    font-size: 16px;
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+  }}
+
+  .toc-list a:hover {{
+    color: #667eea;
+  }}
+
+  /* 페이지 구분 */
+  .page-break {{
+    page-break-after: always;
+  }}
+
+  /* 본문 스타일 */
+  body > h1, body > h2, body > h3, body > p, body > ul, body > ol {{
+    padding-left: 40px;
+    padding-right: 40px;
+  }}
+
+  h1 {{
+    font-weight: 700;
+    font-size: 26px;
+    margin: 40px 0 20px;
+    padding-top: 20px;
+    border-top: 2px solid #dee2e6;
+  }}
+
+  h2 {{
+    font-weight: 700;
+    font-size: 20px;
+    margin: 30px 0 16px;
+    color: #495057;
+  }}
+
+  h3 {{
+    font-weight: 600;
+    font-size: 16px;
+    margin: 20px 0 12px;
+    color: #6c757d;
+  }}
+
+  ul {{
+    margin: 0 0 16px 58px;
+    line-height: 1.8;
+  }}
+
+  ol {{
+    margin: 0 0 16px 58px;
+    line-height: 1.8;
+  }}
+
+  p {{
+    margin: 0 0 12px;
+    line-height: 1.7;
+  }}
+
+  a {{
+    color: #0a58ca;
+    text-decoration: none;
+  }}
+
+  a:hover {{
+    text-decoration: underline;
+  }}
+
+  li {{
+    margin-bottom: 8px;
+  }}
+
+  /* 차트 스타일 */
+  .chart-container {{
+    margin: 24px 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }}
+
+  .chart-image {{
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }}
+
+  .chart-error {{
+    color: #dc3545;
+    font-style: italic;
+    padding: 20px 40px;
+  }}
 </style>
 </head>
 <body>
+{cover_page}
+{toc}
 {body_html}
 </body>
 </html>"""

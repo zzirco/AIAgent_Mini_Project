@@ -20,10 +20,8 @@ def parse_request(state: AgentState) -> Dict[str, Any]:
         "document_ok": False
     }
 
-    # 전역 참조 번호 카운터 초기화
     return {
-        "qa_metrics": qa_metrics,
-        "_global_ref_counter": 1  # 1부터 시작
+        "qa_metrics": qa_metrics
     }
 
 
