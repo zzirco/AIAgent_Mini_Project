@@ -1,0 +1,31 @@
+period: "last_90d"
+regions: ["global", "US", "EU"]
+focus_issues:
+  ["demand_softness", "subsidy_policy", "battery_chemistry", "charging"]
+segments: ["passenger", "SUV"]
+depth: "standard"
+snapshot_date: "2025-10-22"
+output:
+  format: "pdf" # "pdf" | "html"
+  language: "ko"
+  sections:
+    [
+      "summary",
+      "market",
+      "company_compare",
+      "stock",
+      "risk",
+      "reference",
+      "appendix",
+    ]
+constraints:
+  max_pages: 12
+  max_charts: 6
+  min_references: 10
+benchmarks: ["TSLA", "BYDDF", "VWAGY", "300750.SZ", "006400.KQ"]
+policies: ["IRA", "EU_CBAM"]
+financials:
+  base_currency: "USD"
+  multiples: ["PS", "EV_EBITDA"]
+  event_window_days: 7
+persona: "corporate_strategy" # "retail_investor" 로 바꾸면 톤/시사점 전환

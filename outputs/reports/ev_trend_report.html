@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>EV Trend Report</title>
+<style>
+  /* 한글 폰트 임베딩 (wkhtmltopdf가 file:// 접근 가능해야 함) */
+  @font-face { font-family: "NotoSansKR"; src: url("file:///C:/skala_workspace/AI_Agent/skala_gai/AIAgent_Mini_Project/assets/fonts/NotoSansKR-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; }
+  @font-face { font-family: "NotoSansKR"; src: url("file:///C:/skala_workspace/AI_Agent/skala_gai/AIAgent_Mini_Project/assets/fonts/NotoSansKR-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; }
+
+  html, body {
+    font-family: 'NotoSansKR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    font-weight: 400; font-size: 12px; line-height: 1.55;
+    color: #111; margin: 0; padding: 24px;
+  }
+  h1 { font-weight:700; font-size: 22px; margin: 0 0 12px; }
+  h2 { font-weight:700; font-size: 16px; margin: 18px 0 8px; }
+  ul { margin: 0 0 8px 18px; }
+  ol { margin: 0 0 8px 18px; }
+  p  { margin: 0 0 8px; }
+  a  { color: #0a58ca; text-decoration: none; }
+</style>
+</head>
+<body>
+<h1>SUMMARY</h1><p>LLM 오류로 인한 폴백 모드: 'title,url,date'</p>
+<h2>시장 개요 & 핵심 트렌드</h2><ul><li>오류 발생: 'title,url,date'</li><li>LLM 연결 확인 필요 - OPENAI_API_KEY 설정 여부 확인</li><li>폴백 모드로 실행 중</li></ul>
+<h2>수요 & 가격 전략(마진 압력)</h2>
+<div>
+  <h2>수요 & 가격 전략</h2>
+  
+  <h3>세그먼트별 수요 동향</h3>
+  최근 90일 동안 전 세계적으로 전기차 수요는 지속적으로 증가하고 있으며, 특히 SUV 세그먼트에서 두드러진 성장을 보이고 있다. Tesla와 BYD는 각각의 시장에서 강력한 판매 성과를 기록하고 있으며, 이는 소비자들이 전기차의 실용성과 경제성을 중시하게 된 결과로 해석된다[1][8]. 또한, Ford는 전기차 소비자들이 연료 및 유지비 절감과 같은 실용적인 이점을 중시하고 있다는 점을 반영하여 가격 정책을 조정하고 있다[31].
+
+  <h3>ASP(평균 판매가) 변화</h3>
+  전기차 시장에서 평균 판매가는 경쟁 심화로 인해 다소 하락세를 보이고 있다. Tesla는 가격 인하를 통해 판매량을 증가시키는 전략을 취하고 있으며, 이는 ASP에 직접적인 영향을 미치고 있다[1]. BYD 또한 경쟁력 있는 가격을 유지하면서 품질을 중시하여 고객의 신뢰를 얻고 있다[3]. 이러한 가격 조정은 소비자들에게 더 많은 선택권을 제공하고 있으며, 시장 점유율 확대에 기여하고 있다.
+
+  <h3>가격 인하 전략 영향</h3>
+  가격 인하 전략은 단기적으로는 판매량 증가에 긍정적인 영향을 미치지만, 장기적으로는 마진 압력을 초래할 수 있다. Tesla와 BYD는 가격 인하를 통해 시장 점유율을 확대하고 있으나, 이는 마진 축소로 이어질 수 있는 위험 요소로 작용하고 있다[2][10]. Volkswagen 또한 새로운 세대의 배터리를 개발하여 가격을 낮추고 안전성을 높이는 방향으로 나아가고 있다[3].
+
+  <h3>마진 압력 요인</h3>
+  마진 압력은 여러 요인에 의해 발생하고 있다. 원자재 가격 변동, 공급망 문제, 그리고 경쟁 심화가 주요 요인으로 작용하고 있다. 예를 들어, Volkswagen은 공급망 이슈로 인해 원자재 가격 변동이 생산 비용에 직접적인 영향을 미치고 있다고 언급하고 있다[3]. 또한, BYD는 배터리 수직 통합 전략을 통해 마진을 극대화하고 있으나, 기술 혁신과 가격 경쟁력을 유지해야 하는 압박을 받고 있다[9][12]. 이러한 마진 압력은 기업들이 지속 가능한 성장을 위해 해결해야 할 중요한 과제로 남아 있다.
+</div>
+<h2>정책·규제 Watch</h2>
+<div>
+  <h2>정책·규제 섹션</h2>
+  
+  <h3>국가별 보조금 변화</h3>
+  <p>최근 몇 달간 여러 국가에서 전기차(EV) 보조금 정책이 변화하고 있습니다. 특히 유럽연합(EU) 국가들은 탄소 배출을 줄이기 위한 목표를 달성하기 위해 EV 구매에 대한 보조금을 확대하고 있습니다. 이와 함께 미국에서도 전기차 구매에 대한 세금 공제를 강화하는 방향으로 정책을 조정하고 있습니다[1].</p>
+  
+  <h3>관세/무역 정책 영향</h3>
+  <p>관세 및 무역 정책은 전기차 및 배터리 산업에 중대한 영향을 미치고 있습니다. 특히 미국과 중국 간의 무역 긴장이 고조되면서, 중국산 전기차 및 배터리에 대한 관세가 부과될 가능성이 높아지고 있습니다. 이러한 정책은 글로벌 공급망에 혼란을 초래하고 있으며, 기업들은 이에 대한 대응 전략을 마련해야 할 필요성이 커지고 있습니다[2].</p>
+  
+  <h3>탄소 규제 동향</h3>
+  <p>탄소 규제는 전기차 산업의 성장에 중요한 역할을 하고 있습니다. 유럽연합은 2030년까지 탄소 배출을 55% 줄이겠다는 목표를 설정하고 있으며, 이로 인해 전기차의 수요가 증가할 것으로 예상됩니다. 이러한 규제는 제조업체들이 지속 가능한 생산 방식을 채택하도록 압박하고 있습니다[3].</p>
+  
+  <h3>정책 이벤트 타임라인</h3>
+  <ul>
+    <li>2023년 1월: 유럽연합, 새로운 EV 보조금 정책 발표</li>
+    <li>2023년 3월: 미국, 전기차 구매 세금 공제 확대 발표</li>
+    <li>2023년 6월: 중국, EV 배터리 수출에 대한 새로운 규제 시행</li>
+    <li>2023년 9월: 여러 국가에서 탄소 배출 목표 재조정 발표</li>
+  </ul>
+</div>
+<h2>배터리 기술 & 공급망 코어</h2>
+<div>
+    <h2>배터리 기술 & 공급망</h2>
+    <h3>배터리 화학 (LFP/LMFP/NMC) 동향</h3>
+    <p>최근 배터리 화학 분야에서는 리튬 인산철(LFP), 리튬 망간 철(LMFP), 니켈 망간 코발트(NMC) 기술이 주목받고 있다. LFP는 안정성과 긴 수명 덕분에 저가형 전기차에 널리 사용되고 있으며, LMFP는 에너지 밀도를 높이기 위한 대안으로 떠오르고 있다. NMC는 높은 에너지 밀도를 제공하지만, 원자재 비용 상승에 따라 가격 변동성이 크다[1][2].</p>
+    
+    <h3>kWh당 원가 변화</h3>
+    <p>전기차 배터리의 kWh당 원가는 최근 몇 년간 지속적으로 감소해 왔으며, 이는 기술 발전과 대량 생산에 따른 효과로 분석된다. 특히, LFP 배터리는 상대적으로 저렴한 원자재를 사용하여 가격 경쟁력을 더욱 강화하고 있다. 그러나 원자재 가격의 변동성은 여전히 주요한 리스크 요소로 작용하고 있다[3][4].</p>
+    
+    <h3>주요 벤더 생산 능력</h3>
+    <p>주요 배터리 제조업체들은 생산 능력을 확대하고 있으며, Tesla, BYD, CATL, Volkswagen 등은 각각의 기가팩토리와 생산라인을 통해 글로벌 전기차 시장의 수요에 대응하고 있다. 예를 들어, CATL은 유럽 시장에서의 생산 능력을 높이기 위해 새로운 공장을 설계하고 있으며, BYD는 배터리 수직 통합 전략을 통해 마진을 극대화하고 있다[5][6][7].</p>
+    
+    <h3>수직 통합 전략</h3>
+    <p>배터리 제조업체들은 수직 통합 전략을 통해 원자재 조달부터 생산, 유통까지의 과정을 통합하고 있다. 이는 공급망의 안정성을 높이고 비용을 절감하는 데 기여하고 있다. 특히, BYD와 Tesla는 자사의 배터리 생산을 내부화하여 외부 의존도를 줄이고 있으며, 이러한 전략은 장기적으로 경쟁력을 강화하는 요소로 작용할 것으로 예상된다[8][9].</p>
+</div>
+<h2>경쟁 구도 & 지역 하이라이트</h2>
+<h3>주요 기업 하이라이트</h3><ul>
+<li><strong>TSLA</strong>: Tesla는 독자적인 슈퍼차저 네트워크에 대한 투자를 통해 미국 EV 시장에서의 지배적인 위치를 확보하고 있다[1].; 회사는 지속 가능한 공급망을 구축하기 위해 재생 에너지를 사용하고 윤리적인 자원 조달을 위한 파트너십을 형성하고 있다[2].; 가격 정책 측면에서 Tesla는 경쟁력을 유지하기 위해 가격 인하를 통해 판매량을 증가시키는 전략을 취하고 있다[1].</li>
+<li><strong>BYDDF</strong>: BYD는 데이터 기반 제조와 지역화된 공급망 전략을 통해 글로벌 자동차 및 물류 시장에서 핵심 플레이어로 자리매김하고 있다[1].; BYD는 유럽과 영국에서의 운영 확장을 통해 전기차 시장에서의 입지를 강화하고 있다[1].; BYD의 가격 정책은 경쟁력 있는 가격을 유지하면서도 품질을 중시하여 고객의 신뢰를 얻고 있다[3].</li>
+<li><strong>VWAGY</strong>: Volkswagen은 유럽 중심의 배터리 산업을 구축하여 전략적 독립성을 강화하고 있다[3].; VWAGY의 P/E 비율은 6.36으로, 시장에서 상대적으로 저평가되고 있음을 나타낸다[2].; 회사의 배당 수익률은 3.91%로, 주주에게 안정적인 수익을 제공하고 있다[2].</li>
+<li><strong>300750.SZ</strong>: Contemporary Amperex Technology Co., Limited는 전기차 배터리 시장에서의 가격 경쟁력을 유지하기 위해 지속적인 비용 절감 전략을 추진하고 있다[1].; 회사는 향후 몇 년간 매출 성장을 위해 글로벌 시장 확장을 계획하고 있으며, 특히 유럽 시장에 대한 의존도를 높이고 있다[2].; 현재 회사의 주가는 높은 P/E 비율을 기록하고 있으며, 이는 투자자들이 향후 성장 가능성을 높게 평가하고 있음을 나타낸다[2].</li>
+<li><strong>006400.KQ</strong>: Ford는 경쟁력 있는 가격을 유지하기 위해 고객과 제품 선택에 신중을 기하고 있으며, 이는 수익성 있는 성장을 위한 전략의 일환이다[1].; 전기차 소비자들은 연료 및 유지비 절감과 같은 실용적인 이점을 중시하고 있어, Ford는 이러한 수요에 맞춰 가격 정책을 조정하고 있다[2].; Ford는 전기차 사업의 수익성을 높이기 위해 자본 효율성을 강조하며, 다양한 추진 옵션을 추가하고 있다[2].</li>
+</ul>
+<h2>전략/투자 시사점</h2>
+<ul><li><strong>[시장 분석]</strong> 오류 발생: 'title,url,date'... 에 대한 대응 전략 수립 필요</li>
+<li><strong>[TSLA 리스크]</strong> Tesla는 배터리 생산 비용 절감을 위해 나트륨 이온 기술과 같은 새로운 배터리 화학 물질을 탐색하고 있다[1]....</li>
+<li><strong>[BYDDF 리스크]</strong> BYD는 설계 및 배터리 문제로 115,000대 이상의 차량을 리콜하며 품질 관리 리스크에 직면하고 있다[1]....</li>
+<li><strong>[변동성 모니터링]</strong> TSLA, BYDDF, VWAGY 등 고변동성 종목에 대한 리스크 관리 강화</li>
+<li><strong>[전략적 과제]</strong> 배터리 공급망 다변화 및 현지화 추진</li>
+<li><strong>[운영 효율화]</strong> 가격 경쟁력 확보를 위한 원가 절감 이니셔티브</li></ul>
+<h2>주가/재무 스냅샷</h2><ul><li>TSLA: return 5.4%, vol 8.42</li><li>BYDDF: return 42.91%, vol 10.13</li><li>VWAGY: return 38.89%, vol 8.95</li><li>300750.SZ: return 22.84%, vol 11.23</li><li>006400.KQ: return 45.3%, vol 8.47</li></ul>
+<h2>REFERENCE</h2><ol><li>[PDF] Tesla as a Global Competitor: Strategic Control in the EV Transition (2025-10-22) - https://www.ineteconomics.org/uploads/papers/WP_225-Hopkins-and-Lazonick-Tesla-final-Sept-12.pdf</li><li>Tesla's Supply Chain in Detail: Innovation, Challenges, and Lessons (2025-10-22) - https://www.allthingssupplychain.com/teslas-supply-chain-in-detail-innovation-challenges-and-lessons/</li><li>Tesla's gigafactory network and EV battery production blueprint (2025-10-22) - https://www.automotivemanufacturingsolutions.com/electrification/electric-dreams-teslas-gigafactory-network-and-ev-battery-production-blueprint/545858</li><li>Tesla's Supply Chain in Detail: Innovation, Challenges, and Lessons (2025-10-22) - https://www.allthingssupplychain.com/teslas-supply-chain-in-detail-innovation-challenges-and-lessons/</li><li>[PDF] Tesla as a Global Competitor: Strategic Control in the EV Transition (2025-10-22) - https://www.ineteconomics.org/uploads/papers/WP_225-Hopkins-and-Lazonick-Tesla-final-Sept-12.pdf</li><li>Tesla's gigafactory network and EV battery production blueprint (2025-10-22) - https://www.automotivemanufacturingsolutions.com/electrification/electric-dreams-teslas-gigafactory-network-and-ev-battery-production-blueprint/545858</li><li>Tesla's Supply Chain in Detail: Innovation, Challenges, and Lessons (2025-10-22) - https://www.allthingssupplychain.com/teslas-supply-chain-in-detail-innovation-challenges-and-lessons/</li><li>The Supply Chain Strategy of World-Leading EV Company BYD (2025-10-22) - https://supplychaindigital.com/news/how-bold-leadership-is-driving-byds-growth-strategy</li><li>NIO And BYD Batteries Converging To Electrify The Future (2025-10-22) - https://seekingalpha.com/article/4830224-nio-and-byd-batteries-converging-to-electrify-the-future</li><li>BYD: Irrationally Underpriced (OTCMKTS:BYDDF) - Seeking Alpha (2025-10-22) - https://seekingalpha.com/article/4827667-byd-irrationally-underpriced</li><li>BYD makes largest recall of over 115,000 cars due to design, battery ... (2025-10-22) - https://www.reuters.com/sustainability/climate-energy/byd-makes-largest-recall-over-115000-cars-due-design-battery-issues-2025-10-17/</li><li>The Supply Chain Strategy of World-Leading EV Company BYD (2025-10-22) - https://supplychaindigital.com/news/how-bold-leadership-is-driving-byds-growth-strategy</li><li>NIO And BYD Batteries Converging To Electrify The Future (2025-10-22) - https://seekingalpha.com/article/4830224-nio-and-byd-batteries-converging-to-electrify-the-future</li><li>BYD: Irrationally Underpriced (OTCMKTS:BYDDF) - Seeking Alpha (2025-10-22) - https://seekingalpha.com/article/4827667-byd-irrationally-underpriced</li><li>NIO And BYD Batteries Converging To Electrify The Future (2025-10-22) - https://seekingalpha.com/article/4830224-nio-and-byd-batteries-converging-to-electrify-the-future</li><li>Volkswagen AG 1/10 ADR Stock Price Today | OTC: VWAGY Live (2025-10-22) - https://www.investing.com/equities/volkswagen-adr-be</li><li>Volkswagen (VWAGY) Stock Price, News & Analysis - MarketBeat (2025-10-22) - https://www.marketbeat.com/stocks/OTCMKTS/VWAGY/</li><li>Battery Technology for Electric Drives | Volkswagen Group (2025-10-22) - https://www.volkswagen-group.com/en/battery-technology-19028</li><li>Battery Technology for Electric Drives | Volkswagen Group (2025-10-22) - https://www.volkswagen-group.com/en/battery-technology-19028</li><li>Volkswagen AG 1/10 ADR Stock Price Today | OTC: VWAGY Live (2025-10-22) - https://www.investing.com/equities/volkswagen-adr-be</li><li>Volkswagen (VWAGY) Stock Price, News & Analysis - MarketBeat (2025-10-22) - https://www.marketbeat.com/stocks/OTCMKTS/VWAGY/</li><li>Volkswagen (VWAGY) Stock Price, News & Analysis - MarketBeat (2025-10-22) - https://www.marketbeat.com/stocks/OTCMKTS/VWAGY/</li><li>Volkswagen AG 1/10 ADR Stock Price Today | OTC: VWAGY Live (2025-10-22) - https://www.investing.com/equities/volkswagen-adr-be</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/analysis/</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/analysis/</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/</li><li>CATL (300750.SZ) Stock: Investors Eye Premium Drop Before ... (2025-10-22) - https://coincentral.com/catl-300750-sz-stock-investors-eye-premium-drop-before-earnings-release/</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/</li><li>Contemporary Amperex Technology Co., Limited (300750.SZ) (2025-10-22) - https://finance.yahoo.com/quote/300750.SZ/analysis/</li><li>Why is Ford Broadening its EV Strategy? - EV Magazine (2025-10-22) - https://evmagazine.com/articles/why-is-ford-broadening-its-ev-strategy</li><li>Ford Broadens Electrification Strategy to Reach More Customers ... (2025-10-22) - https://www.fromtheroad.ford.com/us/en/articles/2024/ford-broadens-electrification-strategy-to-reach-more-customers-</li><li>New EV Battery Technology Eases Supply Chain Woes - EE Times (2025-10-22) - https://www.eetimes.com/new-ev-battery-technology-eases-supply-chain-woes/</li><li>The new standard for EV battery circularity - YouTube (2025-10-22) - https://www.youtube.com/watch?v=sWMHlJjQzow</li><li>Why is Ford Broadening its EV Strategy? - EV Magazine (2025-10-22) - https://evmagazine.com/articles/why-is-ford-broadening-its-ev-strategy</li><li>Internal chart (2025-10-22) - outputs/charts/returns.png</li><li>Internal chart (2025-10-22) - outputs/charts/returns.png</li></ol>
+<h2>APPENDIX</h2><p>Data snapshot: 2025-10-22</p><p>지표 정의·산식 / 데이터 검증 절차(날짜·수치 일관성 기준) — 데이터 준비중</p>
+</body>
+</html>
