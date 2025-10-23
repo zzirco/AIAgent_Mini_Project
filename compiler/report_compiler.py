@@ -18,135 +18,40 @@ def _generate_appendix_content(state: AgentState) -> str:
     """Appendix 섹션 상세 내용 생성"""
     from datetime import datetime
 
-    snapshot_date = state.get('snapshot_date', datetime.now().strftime('%Y-%m-%d'))
+    snapshot_date = state.get("snapshot_date", datetime.now().strftime("%Y-%m-%d"))
 
-    # 수집된 데이터 통계
     company_count = len(state.get('company_dossiers', []))
     stock_count = len(state.get('stock_snapshots', []))
     reference_count = len(state.get('evidence_map', []))
 
     appendix_html = f"""
     <div class="appendix-section">
-        <h3>데이터 스냅샷</h3>
+        <h3>데이터 개요</h3>
         <ul>
             <li><strong>분석 기준일:</strong> {snapshot_date}</li>
-            <li><strong>데이터 출처:</strong> RAG 기반 벡터 검색, Yahoo Finance API, 웹 크롤링</li>
-            <li><strong>수집된 기업 수:</strong> {company_count}개</li>
-            <li><strong>주가 데이터:</strong> {stock_count}개 종목</li>
-            <li><strong>참고 문헌:</strong> {reference_count}개 소스</li>
+            <li><strong>수집 기업 수:</strong> {company_count}개 기업 프로필</li>
+            <li><strong>주가·재무 샘플:</strong> {stock_count}개 티커 (Tavily 웹 검색 기반, 실패 시 내부 폴백 사용)</li>
+            <li><strong>참고 문헌:</strong> {reference_count}개 문서 (Tavily 실시간 검색 결과 위주)</li>
         </ul>
 
-        <h3>1. 평가 지표 정의 및 산식</h3>
-
-        <h4>1.1 주가 수익률 지표</h4>
+        <h3>사용한 산식</h3>
         <ul>
-            <li><strong>기간 수익률 (Period Return):</strong> ((현재가 - 기준일가) / 기준일가) × 100%</li>
-            <li><strong>변동성 (Volatility):</strong> 일별 수익률의 표준편차 × √252 (연환산)</li>
-            <li><strong>최대 낙폭 (Max Drawdown):</strong> 기간 내 최고점 대비 최대 하락률</li>
+            <li><strong>기간 수익률:</strong> ((마지막 종가 − 시작 종가) ÷ 시작 종가) × 100</li>
+            <li><strong>일간 변동성:</strong> 일별 로그수익률의 표준편차 × 100</li>
+            <li><strong>환율 보정:</strong> 통화가 다를 경우 USD↔KRW 1,300 기준 단순 환산</li>
         </ul>
 
-        <h4>1.2 시장 분석 지표</h4>
+        <h3>검증 및 평가 절차</h3>
         <ul>
-            <li><strong>시장 성장률:</strong> 전년 대비 시장 규모 증가율</li>
-            <li><strong>시장 점유율:</strong> (개별 기업 판매량 / 전체 시장 판매량) × 100%</li>
-            <li><strong>세그먼트 집중도:</strong> 특정 세그먼트의 시장 비중</li>
+            <li><strong>수치 일관성 검사:</strong> 리포트에 표기한 period_return_pct와 원시 시계열을 재계산했을 때 오차 ±0.1% 이내인지 확인</li>
+            <li><strong>문서 인용 관리:</strong> LLM 요약에서 실제로 활용한 Tavily 문서만 evidence_map에 기록</li>
+            <li><strong>데이터 폴백:</strong> 네트워크 미가용 시 준비된 예시 데이터로 보고서 생성을 지속</li>
         </ul>
 
-        <h4>1.3 기업 평가 지표</h4>
+        <h3>생성 파이프라인 메모</h3>
         <ul>
-            <li><strong>매출 성장률 (Revenue Growth):</strong> YoY 매출 증가율</li>
-            <li><strong>영업이익률 (Operating Margin):</strong> (영업이익 / 매출액) × 100%</li>
-            <li><strong>ROE (자기자본이익률):</strong> (당기순이익 / 자기자본) × 100%</li>
-            <li><strong>부채비율 (Debt Ratio):</strong> (총부채 / 총자산) × 100%</li>
-        </ul>
-
-        <h3>2. 데이터 검증 절차</h3>
-
-        <h4>2.1 데이터 수집 방법론</h4>
-        <ol>
-            <li><strong>RAG (Retrieval-Augmented Generation) 기반 정보 검색</strong>
-                <ul>
-                    <li>ChromaDB 벡터 데이터베이스를 활용한 유사도 기반 문서 검색</li>
-                    <li>임베딩 모델을 통한 의미론적 검색</li>
-                    <li>검색 결과의 관련도 점수 기준: 상위 K개 문서 활용</li>
-                </ul>
-            </li>
-            <li><strong>금융 데이터 수집</strong>
-                <ul>
-                    <li>Yahoo Finance API를 통한 실시간 주가 데이터</li>
-                    <li>일별/주별/월별 OHLCV 데이터 수집</li>
-                    <li>기업 재무제표 및 주요 지표 수집</li>
-                </ul>
-            </li>
-            <li><strong>LLM 기반 분석</strong>
-                <ul>
-                    <li>모델: GPT-4 Turbo</li>
-                    <li>Temperature: 0.7 (일관성과 창의성의 균형)</li>
-                    <li>프롬프트 엔지니어링: 페르소나 기반 맞춤형 분석</li>
-                </ul>
-            </li>
-        </ol>
-
-        <h4>2.2 날짜 및 수치 일관성 기준</h4>
-        <ul>
-            <li><strong>데이터 최신성:</strong> 분석 기준일 기준 최근 데이터 우선 활용</li>
-            <li><strong>교차 검증:</strong> 동일 정보에 대해 복수의 데이터 소스 확인</li>
-            <li><strong>수치 일관성:</strong>
-                <ul>
-                    <li>환율 통일: USD 기준으로 통일</li>
-                    <li>기간 통일: 명시된 분석 기간 준수</li>
-                    <li>소수점 처리: 수익률 2자리, 금액 단위 명시</li>
-                </ul>
-            </li>
-        </ul>
-
-        <h4>2.3 품질 관리</h4>
-        <ul>
-            <li><strong>자동화된 워크플로우:</strong> LangGraph를 통한 체계적 분석 파이프라인</li>
-            <li><strong>다단계 검증:</strong>
-                <ul>
-                    <li>Market Research Agent: 시장 동향 분석</li>
-                    <li>Company Intelligence Agent: 기업 정보 수집</li>
-                    <li>Finance Agent: 재무 데이터 분석</li>
-                    <li>Report Compiler: 통합 보고서 생성 및 검증</li>
-                </ul>
-            </li>
-            <li><strong>데이터 품질 체크:</strong> 결측치, 이상치, 중복 데이터 자동 감지 및 처리</li>
-        </ul>
-
-        <h3>3. 분석 범위 및 한계</h3>
-
-        <h4>3.1 분석 대상</h4>
-        <ul>
-            <li><strong>지역:</strong> {', '.join(state.get('regions', ['Global']))}</li>
-            <li><strong>기간:</strong> {state.get('period', 'N/A')}</li>
-            <li><strong>세그먼트:</strong> {', '.join(state.get('segments', ['All Segments']))}</li>
-        </ul>
-
-        <h4>3.2 데이터 한계</h4>
-        <ul>
-            <li>본 보고서는 공개된 데이터를 기반으로 작성되었으며, 비공개 정보는 반영되지 않았을 수 있습니다.</li>
-            <li>주가 데이터는 과거 실적 기반이며, 미래 수익을 보장하지 않습니다.</li>
-            <li>RAG 검색 결과는 데이터베이스 내 문서의 품질과 범위에 따라 제한될 수 있습니다.</li>
-        </ul>
-
-        <h4>3.3 면책 사항</h4>
-        <ul>
-            <li>본 보고서는 AI 시스템에 의해 생성된 분석 자료로, 투자 판단의 참고 자료일 뿐 투자 권유가 아닙니다.</li>
-            <li>시장 상황 및 경쟁 환경은 빠르게 변화할 수 있으므로, 투자 결정 시 최신 정보를 재확인해야 합니다.</li>
-            <li>투자 결정에 따른 손익은 투자자 본인의 책임이며, 본 보고서 작성자는 이에 대한 법적 책임을 지지 않습니다.</li>
-            <li>본 보고서의 무단 복제 및 배포를 금지합니다.</li>
-        </ul>
-
-        <h3>4. 사용된 기술 스택</h3>
-        <ul>
-            <li><strong>워크플로우 엔진:</strong> LangGraph (Multi-Agent Orchestration)</li>
-            <li><strong>LLM:</strong> OpenAI GPT-4 Turbo</li>
-            <li><strong>벡터 DB:</strong> ChromaDB</li>
-            <li><strong>임베딩:</strong> OpenAI text-embedding-3-small</li>
-            <li><strong>금융 데이터:</strong> yfinance (Yahoo Finance API)</li>
-            <li><strong>시각화:</strong> matplotlib, seaborn</li>
-            <li><strong>PDF 생성:</strong> wkhtmltopdf / WeasyPrint / ReportLab (폴백)</li>
+            <li><strong>LLM:</strong> OpenAI gpt-4o-mini (temperature 0.3, JSON 응답 모드)</li>
+            <li><strong>워크플로우:</strong> LangGraph 기반 멀티 에이전트가 시장 요약·기업 분석·보고서 통합 순으로 실행</li>
         </ul>
     </div>
     """
@@ -252,7 +157,7 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
                 </tr>
                 <tr>
                     <td class="info-label">AI 모델</td>
-                    <td class="info-value">GPT-4 Turbo</td>
+                    <td class="info-value">gpt-4o-mini</td>
                 </tr>
             </table>
         </div>
@@ -445,9 +350,9 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 60px;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-    color: white;
+    padding: 48px 64px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8f0ff 50%, #cdd8ff 100%);
+    color: #1b263b;
   }}
 
   .cover-header {{
@@ -462,7 +367,8 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
 
   .logo-icon {{
     font-size: 36px;
-    background: rgba(255, 255, 255, 0.2);
+    background: #1b263b;
+    color: #ffffff;
     padding: 8px 16px;
     border-radius: 8px;
   }}
@@ -471,6 +377,7 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
     font-size: 18px;
     font-weight: 600;
     letter-spacing: 0.5px;
+    color: #1b263b;
   }}
 
   .cover-main {{
@@ -479,18 +386,18 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
   }}
 
   .cover-title h1 {{
-    font-size: 48px;
+    font-size: 46px;
     font-weight: 700;
     margin: 0 0 20px;
     letter-spacing: -0.5px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: #1b263b;
   }}
 
   .cover-title h2 {{
-    font-size: 32px;
-    font-weight: 400;
-    margin: 0 0 30px;
-    opacity: 0.95;
+    font-size: 30px;
+    font-weight: 500;
+    margin: 0 0 28px;
+    color: #334155;
   }}
 
   .cover-subtitle {{
@@ -499,18 +406,17 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
 
   .cover-subtitle p {{
     font-size: 16px;
-    font-weight: 300;
-    letter-spacing: 1px;
-    opacity: 0.9;
+    font-weight: 400;
+    letter-spacing: 0.8px;
+    color: #52606d;
   }}
 
   .cover-info-box {{
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
+    background: #ffffff;
     border-radius: 16px;
-    padding: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    padding: 36px 40px;
+    border: 1px solid #d0d7e2;
+    box-shadow: 0 12px 24px rgba(27, 38, 59, 0.08);
   }}
 
   .cover-info-table {{
@@ -519,7 +425,7 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
   }}
 
   .cover-info-table tr {{
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid #e2e8f0;
   }}
 
   .cover-info-table tr:last-child {{
@@ -534,33 +440,31 @@ def compose_sections(state: AgentState) -> Dict[str, Any]:
   .info-label {{
     font-weight: 600;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
+    color: #475569;
     width: 35%;
   }}
 
   .info-value {{
-    font-weight: 400;
+    font-weight: 600;
     font-size: 14px;
-    color: white;
+    color: #1b263b;
   }}
 
   .cover-footer {{
     text-align: center;
     margin-top: 40px;
+    color: #64748b;
+    font-size: 12px;
   }}
 
   .cover-disclaimer {{
-    font-size: 11px;
-    opacity: 0.75;
     margin: 8px 0;
   }}
 
   .cover-confidential {{
-    font-size: 10px;
     font-weight: 600;
-    opacity: 0.65;
-    margin: 8px 0;
     letter-spacing: 1px;
+    color: #475569;
   }}
 
   /* 목차 스타일 */
