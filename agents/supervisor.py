@@ -2,14 +2,18 @@
 """
 Supervisor Agent
 LangGraph 노드 및 조건부 라우팅 함수들로 구성
+LangChain Runnable 기반으로 LangSmith 트레이싱 지원
 """
 from typing import Dict, Any, Literal
 from state import AgentState
+from langchain_core.runnables import chain
 
 
+@chain
 def parse_request(state: AgentState) -> Dict[str, Any]:
     """
     사용자 입력 파싱 및 초기화 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Supervisor] parse_request - run_id: {state['run_id']}")
 
@@ -25,9 +29,11 @@ def parse_request(state: AgentState) -> Dict[str, Any]:
     }
 
 
+@chain
 def merge_artifacts(state: AgentState) -> Dict[str, Any]:
     """
     각 에이전트의 결과물을 병합하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Supervisor] merge_artifacts")
 
@@ -49,9 +55,11 @@ def merge_artifacts(state: AgentState) -> Dict[str, Any]:
     return {"draft_report_md": "\n".join(draft)}
 
 
+@chain
 def qa_gate(state: AgentState) -> Dict[str, Any]:
     """
     품질 검증 게이트 노드 - 모든 QA 정보를 통합
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Supervisor] qa_gate")
 

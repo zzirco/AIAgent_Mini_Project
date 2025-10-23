@@ -2,6 +2,7 @@
 """
 Stock_Analyzer Agent
 LangGraph 노드 함수들로 구성
+LangChain Runnable 기반으로 LangSmith 트레이싱 지원
 """
 from typing import Dict, Any
 from state import AgentState
@@ -11,8 +12,10 @@ from services.finance import (
     fetch_fundamentals,
     ensure_currency,
 )
+from langchain_core.runnables import chain
 
 
+@chain
 def fetch_prices_financials(state: AgentState) -> Dict[str, Any]:
     """
     각 ticker별 가격 시계열 + 기초 재무를 services.finance에서 취득하는 노드
@@ -33,10 +36,12 @@ def fetch_prices_financials(state: AgentState) -> Dict[str, Any]:
     }
 
 
+@chain
 def compute_snapshots(state: AgentState) -> Dict[str, Any]:
     """
     시계열로 기간 수익률/변동성 계산하는 노드
     fundamentals 함께 포함해 multiples 필드 구성
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Stock_Analyzer] compute_snapshots")
 
@@ -60,10 +65,12 @@ def compute_snapshots(state: AgentState) -> Dict[str, Any]:
     return {"stock_snapshots": snapshots}
 
 
+@chain
 def validate_financial_consistency(state: AgentState) -> Dict[str, Any]:
     """
     compute_snapshots에서 계산된 period_return_pct가,
     원시 시계열로 재계산한 값과 ±0.1% 이내인지 확인하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Stock_Analyzer] validate_financial_consistency")
 

@@ -2,14 +2,20 @@
 """
 Market_Researcher Agent
 LangGraph 노드 함수들로 구성
+LangChain Runnable 기반으로 LangSmith 트레이싱 지원
 """
 from typing import Dict, Any
 from state import AgentState
 from services.ingest import fetch_market_sources, normalize_records
+from langchain_core.runnables import chain
 
 
+@chain
 def collect_market_docs(state: AgentState) -> Dict[str, Any]:
-    """시장 관련 문서 수집 노드"""
+    """
+    시장 관련 문서 수집 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Market_Researcher] collect_market_docs - period: {state['period']}, regions: {state['regions']}")
 
     docs = fetch_market_sources(
@@ -23,8 +29,12 @@ def collect_market_docs(state: AgentState) -> Dict[str, Any]:
     return {"raw_docs": normalized}
 
 
+@chain
 def index_market_docs(state: AgentState) -> Dict[str, Any]:
-    """수집된 문서를 벡터DB에 인덱싱하는 노드"""
+    """
+    수집된 문서를 벡터DB에 인덱싱하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Market_Researcher] index_market_docs - docs count: {len(state['raw_docs'])}")
 
     # 실제 구현에서는 VectorDB 인덱싱; 여기선 id만 등록
@@ -33,6 +43,7 @@ def index_market_docs(state: AgentState) -> Dict[str, Any]:
     return {"indexed_ids": new_ids}
 
 
+@chain
 def extract_market_signals(state: AgentState) -> Dict[str, Any]:
     """인덱싱된 문서에서 시장 신호 추출 및 요약 노드 (LLM 사용)"""
     print(f"[Market_Researcher] extract_market_signals - focus_issues: {state['focus_issues']}")
@@ -115,8 +126,12 @@ def extract_market_signals(state: AgentState) -> Dict[str, Any]:
         return {"market_brief": market_brief}
 
 
+@chain
 def validate_citations_market(state: AgentState) -> Dict[str, Any]:
-    """시장 섹션의 인용 검증 및 evidence_map에 등록하는 노드"""
+    """
+    시장 섹션의 인용 검증 및 evidence_map에 등록하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Market_Researcher] validate_citations_market")
 
     evidence_entries = []

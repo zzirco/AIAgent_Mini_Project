@@ -2,16 +2,20 @@
 """
 Company_Analyzer Agent
 LangGraph 노드 함수들로 구성
+LangChain Runnable 기반으로 LangSmith 트레이싱 지원
 """
 from typing import Dict, Any
 from state import AgentState
 from services.ingest import fetch_company_sources, normalize_records
 from services import rag
+from langchain_core.runnables import chain
 
 
+@chain
 def collect_company_docs(state: AgentState) -> Dict[str, Any]:
     """
     벤치마크 기업에 대한 IR/공시/보도자료 수집 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Company_Analyzer] collect_company_docs - benchmarks: {state.get('benchmarks', [])}")
 
@@ -27,9 +31,11 @@ def collect_company_docs(state: AgentState) -> Dict[str, Any]:
     return {"raw_docs": docs}
 
 
+@chain
 def index_company_docs(state: AgentState) -> Dict[str, Any]:
     """
     회사 관련 raw_docs를 인메모리 RAG 인덱스로 구축하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Company_Analyzer] index_company_docs - docs count: {len(state.get('raw_docs', []))}")
 
@@ -45,6 +51,7 @@ def index_company_docs(state: AgentState) -> Dict[str, Any]:
     }
 
 
+@chain
 def compose_company_dossiers(state: AgentState) -> Dict[str, Any]:
     """
     LLM으로 기업 정보 요약 및 도시에 작성
@@ -151,9 +158,11 @@ def compose_company_dossiers(state: AgentState) -> Dict[str, Any]:
     }
 
 
+@chain
 def validate_citations_company(state: AgentState) -> Dict[str, Any]:
     """
     company_dossiers[].evidence를 evidence_map으로 병합하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
     """
     print(f"[Company_Analyzer] validate_citations_company")
 

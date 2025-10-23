@@ -2,10 +2,12 @@
 """
 Chart_Generator Agent
 LangGraph 노드 함수들로 구성
+LangChain Runnable 기반으로 LangSmith 트레이싱 지원
 """
 from typing import Dict, Any, List
 from pathlib import Path
 from state import AgentState
+from langchain_core.runnables import chain
 import matplotlib
 matplotlib.use('Agg')  # GUI 없이 백그라운드에서 실행
 import matplotlib.pyplot as plt
@@ -34,8 +36,12 @@ def _setup_korean_font():
         print(f"[Chart_Generator] Font setup failed: {e}")
 
 
+@chain
 def select_chart_specs(state: AgentState) -> Dict[str, Any]:
-    """차트 사양을 선택하는 노드"""
+    """
+    차트 사양을 선택하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Chart_Generator] select_chart_specs")
 
     # 수집된 데이터를 기반으로 차트 스펙 결정
@@ -72,8 +78,12 @@ def select_chart_specs(state: AgentState) -> Dict[str, Any]:
     return {"_chart_specs": chart_specs}
 
 
+@chain
 def render_charts(state: AgentState) -> Dict[str, Any]:
-    """차트를 렌더링하는 노드"""
+    """
+    차트를 렌더링하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Chart_Generator] render_charts")
 
     _setup_korean_font()
@@ -160,6 +170,12 @@ def _render_market_trends_chart(state: AgentState, out_dir: Path, chart_id: str,
             clean_text = clean_text[:47] + "..."
         trend_labels.append(clean_text)
 
+    # 오류 메시지가 포함된 경우 차트 생성 스킵
+    error_keywords = ["LLM 호출 오류", "오류 발생", "LLM 연결 확인", "폴백 모드"]
+    if any(keyword in label for label in trend_labels for keyword in error_keywords):
+        print(f"[Chart_Generator] Skipping chart generation due to error in trend data")
+        return None
+
     fig, ax = plt.subplots(figsize=(10, 6))
     y_pos = range(len(trend_labels))
     values = [len(trend_labels) - i for i in range(len(trend_labels))]  # 중요도를 숫자로 표현
@@ -208,8 +224,12 @@ def _render_company_highlights_chart(state: AgentState, out_dir: Path, chart_id:
     return chart_path
 
 
+@chain
 def register_chart_assets(state: AgentState) -> Dict[str, Any]:
-    """차트 자산을 evidence_map에 등록하는 노드"""
+    """
+    차트 자산을 evidence_map에 등록하는 노드
+    LangChain Runnable로 래핑되어 LangSmith에 트레이싱됩니다.
+    """
     print(f"[Chart_Generator] register_chart_assets")
 
     evidence_entry = {

@@ -11,15 +11,40 @@ import yaml
 from datetime import datetime
 import os
 
-# .env 파일 로드 (OPENAI_API_KEY 등)
+# .env 파일 로드 (OPENAI_API_KEY, LANGCHAIN_API_KEY 등)
+# 중요: 이 설정은 다른 모든 import 전에 실행되어야 합니다
 try:
     from dotenv import load_dotenv
     load_dotenv()
     print("[Main] .env file loaded")
+
+    # OpenAI API Key 확인
     if os.getenv("OPENAI_API_KEY"):
-        print("[Main] OPENAI_API_KEY found")
+        print("[Main] ✓ OPENAI_API_KEY found")
     else:
-        print("[Main] WARNING: OPENAI_API_KEY not found in environment")
+        print("[Main] ✗ WARNING: OPENAI_API_KEY not found in environment")
+
+    # LangSmith 트레이싱 설정 (LLM 생성 전에 반드시 설정되어야 함)
+    langchain_api_key = os.getenv("LANGCHAIN_API_KEY")
+    if langchain_api_key:
+        # 트레이싱 활성화
+        os.environ["LANGCHAIN_TRACING_V2"] = "true"
+        os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
+        os.environ["LANGCHAIN_API_KEY"] = langchain_api_key
+
+        # 프로젝트 이름 설정
+        project_name = os.getenv("LANGCHAIN_PROJECT", "ev-market-trend-analysis")
+        os.environ["LANGCHAIN_PROJECT"] = project_name
+
+        print(f"[Main] ✓ LangSmith tracing ENABLED")
+        print(f"[Main]   - Project: {project_name}")
+        print(f"[Main]   - Endpoint: {os.environ['LANGCHAIN_ENDPOINT']}")
+        print(f"[Main]   - API Key: {langchain_api_key[:10]}...")
+    else:
+        os.environ["LANGCHAIN_TRACING_V2"] = "false"
+        print("[Main] ✗ LangSmith tracing DISABLED (LANGCHAIN_API_KEY not found)")
+        print("[Main]   To enable: Set LANGCHAIN_API_KEY in .env file")
+
 except ImportError:
     print("[Main] WARNING: python-dotenv not installed. Run: pip install python-dotenv")
 except Exception as e:

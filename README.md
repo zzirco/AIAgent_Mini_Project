@@ -16,16 +16,16 @@
 
 ## Tech Stack
 
-| Category  | Details                                   |
-| --------- | ----------------------------------------- |
-| Framework | LangGraph, LangChain, Python              |
-| LLM       | GPT-4o-mini                               |
-| Retrieval | Hybrid Retrieval (Semantic + BM25)        |
-| Embedding | OllamaEmbeddings (nomic-embed-text)       |
-| Vector Store | ChromaDB                               |
-| Data      | yfinance/재무API, 뉴스/IR/PDF 로더         |
-| Chart     | WeasyPrint                                |
-| Report    | ReportLab                                 |
+| Category     | Details                             |
+| ------------ | ----------------------------------- |
+| Framework    | LangGraph, LangChain, Python        |
+| LLM          | GPT-4o-mini                         |
+| Retrieval    | Hybrid Retrieval (Semantic + BM25)  |
+| Embedding    | OllamaEmbeddings (nomic-embed-text) |
+| Vector Store | ChromaDB                            |
+| Data         | yfinance/재무API, 뉴스/IR/PDF 로더  |
+| Chart        | WeasyPrint                          |
+| Report       | ReportLab                           |
 
 ## Agents
 
@@ -71,7 +71,7 @@
 | **charts**           | **Chart_Generator · `render_charts`**                                                                                                                   | Report_Compiler(compose/export)                                                             | 이미지 경로/alt 포함        |
 | **evidence_map**     | **Market_Researcher · `validate_citations_market`**, **Company_Analyzer · `validate_citations_company`**, **Chart_Generator · `register_chart_assets`** | Supervisor · `qa_gate`, Report_Compiler(compose/REFERENCE)                                  | [n] ↔ 링크 매핑             |
 | **draft_report_md**  | **Supervisor · `merge_artifacts`**(초안 뼈대) → **Report_Compiler · `compose_sections`**(본문 완성)                                                     | Report_Compiler(export), Supervisor · `qa_gate`                                             | 초안→완성 단계              |
-| **report_path**      | **Report_Compiler · `export_pdf`**                                                                                                                      | 리포트 최종 생성                                       | 최종 산출물 경로            |
+| **report_path**      | **Report_Compiler · `export_pdf`**                                                                                                                      | 리포트 최종 생성                                                                            | 최종 산출물 경로            |
 
 ### C) 품질/메타/오류 State
 
@@ -104,13 +104,7 @@
 ## Usage (예시)
 
 ```bash
-# Weekly Global Pulse (빠른 분석, 7일)
-ev-agent run \
-  --period last_7d --regions global \
-  --issues demand_softness subsidy_policy battery_chemistry charging \
-  --depth quick --output pdf --lang ko \
-  --sections summary,market,company_compare,stock,risk,reference \
-  --max-pages 4 --max-charts 3
+python app.py
 ```
 
 ## Output
